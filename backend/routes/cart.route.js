@@ -16,7 +16,7 @@ import requireAuth from '../middleware/requireAuth.js';
 
 const router = express.Router();
 
-router.post("/process-order", requireAuth, processOrder);
+router.post("/process-order", processOrder);
 router.get("/", getCart); 
 router.get("/:orderID", getCartByOrderID);
 router.post("/", createCart); 

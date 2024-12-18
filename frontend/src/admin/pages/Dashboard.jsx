@@ -425,7 +425,7 @@ const handleAccDisapprove = async (_id) => {
 
 
    return (
-     <Box p={5}>
+     <Box p={5} bg="white">
        <Tabs variant="enclosed">
          <TabList>
            <Tab>Inventory</Tab>

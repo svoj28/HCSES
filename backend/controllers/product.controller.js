@@ -17,7 +17,7 @@ export const getProduct = async (req, res) =>{
 
 //Create
 export const createProduct = async (req, res) => {
-    const { name, price, image, quantity, description } = req.body;
+    const { name, price, image, quantity, description, product_type } = req.body;
 
     if (!name || !price || !image || !quantity ) {
         return res.status(400).json({ success: false, message: "Please provide all fields" });
@@ -28,7 +28,34 @@ export const createProduct = async (req, res) => {
         price, 
         image, 
         quantity, 
-        description });
+        description,
+        product_type:""
+    });
+
+    try {
+        await newProduct.save();
+        res.status(201).json({ success: true, data: newProduct });
+    } catch (error) {
+        console.error("Error in Create product: ", error.message);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+}
+
+export const createPromo = async (req, res) => {
+    const { name, price, image, quantity, description, product_type } = req.body;
+
+    if (!name || !price || !image || !quantity ) {
+        return res.status(400).json({ success: false, message: "Please provide all fields" });
+    }
+
+    const newProduct = new Product({ 
+        name, 
+        price, 
+        image, 
+        quantity, 
+        description,
+        product_type
+    });
 
     try {
         await newProduct.save();

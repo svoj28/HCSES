@@ -5,68 +5,50 @@ import TransactionHistory from "../models/transaction.model.js";
 
 export const processOrder = async (req, res) => {
   try {
-    const { productID, formData } = req.body;
-    const user_id = req.user._id;
+    const {
+      product_name, // Add product_name here
+      name,
+      contact_number,
+      email_address,
+      home_address,
+      delivery_date,
+      additional_info,
+      order_status,
+      price,
+    } = req.body;
 
-    // Find the product
-    const product = await Product.findById(productID);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    // Validate required fields
+    if (!contact_number || !home_address || !delivery_date || !product_name) {  // Ensure product_name is present
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
-    if (product.quantity < 1) {
-      return res.status(400).json({ message: "Insufficient stock" });
-    }
-
-    // Generate random order ID
+    // Generate unique order ID
     const generateRandomCode = () => Math.random().toString(36).substr(2, 10).toUpperCase();
     const orderID = generateRandomCode();
 
-    // Prepare data
-    const cartItem = {
+    // Create new order
+    const newOrder = new Cart({
       orderID,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      customer_name: formData.customer_name,
-      delivery_date: formData.delivery_date,
-      address: formData.address,
-      additional_info: formData.additional_info,
-      user_id,
-      event_status: 'Upcoming', 
-      order_status: 'Pending' 
-    };
+      price: "Pending",
+      name,
+      contact_number,
+      email_address: email_address || "", // Optional
+      address: home_address,
+      delivery_date: new Date(delivery_date),
+      additional_info: additional_info || "",
+      product_name,  // Save the selected product_name in the order
+      event_status: "Upcoming",
+    });
 
-    const transactionHistoryItem = {
-      orderID,
-      customer_name: formData.customer_name,
-      address: formData.address,
-      name: product.name,
-      price: product.price,
-      delivery_date: new Date(formData.delivery_date).toISOString(),
-      user_id,
-      event_status: '',
-      order_status: ''
-    };
-
-    // Add item to cart
-    const newCart = new Cart(cartItem);
-    await newCart.save();
-
-    // Add to transaction history
-    const newTransaction = new TransactionHistory(transactionHistoryItem);
-    await newTransaction.save();
-
-    // Update product quantity
-    product.quantity -= 1;
-    await product.save();
-
-    res.status(201).json({ message: "Order processed successfully", cartItem });
+    await newOrder.save();
+    res.status(201).json({ message: "Order added successfully", data: newOrder });
   } catch (error) {
     console.error("Error processing order:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
 
 // Fetch cart by orderID
 export const getCartByOrderID = async (req, res) => {
@@ -190,13 +172,30 @@ export const deleteCart = async (req, res) => {
 }
 
 export const addCart = async (req, res) => {
+  console.log('Received data:', req.body);
+
   try {
     const { packageName, price, customerName, deliveryDate, address, contactNumber, additionalInfo } = req.body;
 
+    // Validate required fields
     if (!packageName || !price || !customerName || !deliveryDate || !address || !contactNumber) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Logging before creating the cart
+    console.log("Creating new cart with:", {
+      orderID: Math.random().toString(36).substr(2, 10).toUpperCase(),
+      name: packageName,
+      price,
+      customer_name: customerName,
+      delivery_date: new Date(deliveryDate),
+      address,
+      additional_info: additionalInfo || "",
+      order_status: "Pending", // Default is 'Pending'
+      event_status: "Upcoming", // Default is 'Upcoming'
+    });
+
+    // Create the cart document
     const newCart = new Cart({
       orderID: Math.random().toString(36).substr(2, 10).toUpperCase(),
       name: packageName,
@@ -205,18 +204,23 @@ export const addCart = async (req, res) => {
       delivery_date: new Date(deliveryDate),
       address,
       additional_info: additionalInfo || "",
-      user_id: req.user._id || "guest",
-      order_status: "Pending",
-      event_status: "Upcoming",
+      order_status: "Pending", // Default to 'Pending'
+      event_status: "Upcoming", // Default to 'Upcoming'
     });
 
+    // Save to the database
     const savedCart = await newCart.save();
+
+    // Logging after saving the cart
+    console.log("Saved Cart:", savedCart);
+
     res.status(201).json({ message: "Cart added successfully", data: savedCart });
   } catch (error) {
     console.error("Error adding cart:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 
 // Walkin

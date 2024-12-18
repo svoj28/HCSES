@@ -2,51 +2,49 @@ import mongoose from 'mongoose';
 
 const cartSchema = new mongoose.Schema({
   orderID: {
-    type: String, 
-    required: true, 
-    unique: true 
-  },
-  name: { 
-    type: String, 
-    required: true 
-  },
-  price: { 
-    type: Number, 
-    required: true 
-  },
-  image: { 
-    type: String, 
-  },
-  customer_name: { 
-    type: String, 
-    required: true 
-  },
-  delivery_date: { 
-    type: Date, 
-    required: true 
-  },
-  address: { 
-    type: String, 
-    required: true 
-  },
-  additional_info: { 
-    type: String 
-  },
-  user_id:{
     type: String,
     required: true,
-    default: "Walkin Customer"
+    unique: true
   },
-  order_status:{
+  name: {
     type: String,
-    
+    required: true
   },
-  event_status:{
+  price: {
     type: String,
-   
+    required: true
   },
-  cancellation_status:{
-    type: String
+  product_name: {
+    type: String,
+    required: true
+  },
+  contact_number: {
+    type: String,
+    required: true
+  },
+  email_address: {
+    type: String,
+    default: ""
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  delivery_date: {
+    type: Date,
+    required: true
+  },
+  additional_info: {
+    type: String,
+    default: ""
+  },
+  order_status: {
+    type: String,
+    default: "Pending"  // Default status is 'Pending'
+  },
+  event_status: {
+    type: String,
+    default: "Upcoming"
   }
 });
 

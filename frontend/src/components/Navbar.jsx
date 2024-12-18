@@ -462,6 +462,7 @@ if (isAdminRoute) return null;
     </Button>
 
     {/* Add Event - Circular Button */}
+    <Link to="/addevent">
     <Button
   variant="link"
   borderRadius="full"  
@@ -490,6 +491,7 @@ if (isAdminRoute) return null;
     transition="filter 0.2s ease"
   />
 </Button>
+</Link>
 
 
   </Flex>
